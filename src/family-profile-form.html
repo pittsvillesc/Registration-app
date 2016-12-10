@@ -1,0 +1,97 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-document.html">
+<link rel="import" href="shared-styles.html">
+<dom-module id="family-profile-form">
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
+                padding: 10px;
+            }
+        </style>
+        <firebase-document
+            id="profileDoc" app-name="registration-app" path="[[_computePath()]]" data="{{form}}"> </firebase-document>
+        <div class="card">
+            <h2>Family Contact Information</h1>
+            <div id="formContainer">
+                <paper-input id="firstName" value="{{form.firstName}}" label="First Name"></paper-input>
+                <paper-input id="lastName" value="{{form.lastName}}" label="Last Name"></paper-input>
+                <paper-input id="streetAddress" value="{{form.streetAddress}}" label="Street Address"></paper-input>
+                <paper-input id="city" value="{{form.city}}" label="City"></paper-input>
+                <paper-input id="zip" value="{{form.zip}}" label="Zip Code"></paper-input>
+                <paper-input id="primaryPhone" value="{{form.primaryPhone}}" label="Primary Phone"></paper-input>
+                <paper-input id="secondaryPhone" value="{{form.secondaryPhone}}" label="Secondary Phone"></paper-input>
+                <paper-input id="email" value="{{form.email}}" label="Email Address"></paper-input>
+                
+            </div>
+        </div>
+    </template>
+    <script>
+        Polymer({
+            is: 'family-profile-form',
+            properties: {
+                form: {
+                    type: Object,
+                    notify: true,
+                    value: {
+                        firstName: "",
+                        lastName: "",
+                        streetAddress: "",
+                        city: "",
+                        zip: "",
+                        primaryPhone: "",
+                        secondaryPhone: "",
+                        email: ""
+                    }
+                },
+                add: {
+                    type: Boolean,
+                    value: false,
+                    reflectToAttribute: true
+                },
+                edit: {
+                    type: Boolean,
+                    value: false,
+                    reflectToAttribute: true
+                },
+                user: {
+                    type: Object,
+                    notfiy: true
+                },
+//                userid: {
+//                    type: String,
+//                    notify: true
+//                },
+                key: {
+                    type: String
+                }
+            },
+            saveProfile: function() {
+//                alert("PROFILE SAVED! - " + (this.add ? "ADD MODE" : "EDIT MODE"));
+                console.log(this.$.profileDoc.path);
+                console.log(this.form);
+                alert(this.form);
+//                this.$.profileDoc.save(this.$.profileDoc.path + this.form);
+            },
+            _computePath: function() {
+//                alert("Mode: " + (this.add) ? "Add" : "Edit");
+//                alert(this.userid);
+                console.log(user);
+                if (this.add) {
+                    return "/family-profile/" + this.user.uid + "/";
+                } else {
+                    return "/family-profile/" + this.user.uid + "/" + this.key + "/";
+                }
+            }
+        });
+    </script>
+</dom-module>

@@ -1,0 +1,71 @@
+<!--<link rel="import" href="../polymer/polymer.html">-->
+<!--
+`my-sign-in`
+plug in sign in element for a firebase app
+
+@demo demo/index.html 
+-->
+<link rel="import" href="../bower_components/login-fire/login-fire.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-app.html">
+<dom-module id="my-sign-in">
+    <template>
+        <style>
+            :host {
+                position: absolute;
+                top: 64px;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: var(--sign-in-background-color, rgb(58, 71, 76));
+                transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                z-index: 1;
+                color: var(--sign-in-text-color, rgb(255, 255, 255));
+                @apply(--layout);
+                @apply(--layout-center-center);
+            }
+            
+            :host([signed-in]) {
+                opacity: 0;
+                pointer-events: none;
+            }
+            
+            paper-button > * {
+                vertical-align: middle;
+                text-transform: none;
+            }
+        </style>
+<!--        <firebase-app id="regApp" auth-domain="registration-app-a043a.firebaseapp.com" database-url="https://registration-app-a043a.firebaseio.com/" api-key="AIzaSyCb-qKlzvWaz6gwyURFilfpCr1HUbnZCN8" name="registration-app"> </firebase-app>-->
+        <login-fire id="auth" reverse mini horizontal email-password auto-sign-up google app-name="registration-app" user="{{user}}" signed-in="{{signedIn}}"></login-fire>
+    </template>
+    <script>
+        Polymer({
+            is: 'my-sign-in'
+            , properties: {
+                prop1: {
+                    type: String
+                    , value: 'Sign In Page'
+                , }
+//                , app: {
+//                    type: Object
+//                    , notify: true
+//                }
+                , user: {
+                    type: String
+                    , reflectToAttribute: true
+                    , notify: true
+                }
+                , signedIn: {
+                    type: Boolean
+                    , value: false
+                    , reflectToAttribute: true
+                    , notify: true
+                }
+            }
+            , signOut: function () {
+                if (this.$.auth) {
+                    this.$.auth.signOut();
+                }
+            }
+        });
+    </script>
+</dom-module>
