@@ -1,0 +1,152 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/app-layout/app-drawer/app-drawer.html">
+<link rel="import" href="../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
+<link rel="import" href="../bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="../bower_components/app-layout/app-header-layout/app-header-layout.html">
+<link rel="import" href="../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
+<link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="../bower_components/app-route/app-location.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
+<link rel="import" href="../bower_components/paper-styles/paper-styles-classes.html">
+<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../bower_components/iron-selector/iron-selector.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-app.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-document.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-query.html">
+<!--<link rel="import" href="my-icons.html">-->
+<link rel="import" href="my-sign-in.html">
+<link rel="import" href="shared-styles.html">
+<dom-module id="registration-app">
+    <template>
+        <style>
+            :host {
+                --app-primary-color: var(--default-primary-color);
+                --app-secondary-color: var(--accent-color);
+                display: block;
+            }
+            
+            app-header {
+                color: var(--paper-toolbar-color);
+                background-color: var(--paper-toolbar-background);
+            }
+            
+            app-header paper-icon-button {
+                --paper-icon-button-ink-color: white;
+                color: var(--paper-toolbar-color);
+            }
+            
+            app-drawer {
+                background-color: var(--primary-background-color);
+                color: var(--default-primary-color);
+            }
+            /*
+            app-drawer app-toolbar{
+                color: var(--paper-toolbar-color);
+                background-color: #FF847C;
+            }
+*/
+            
+            .drawer-list {
+                margin: 0 20px;
+            }
+            
+            .drawer-list a {
+                display: block;
+                padding: 0 16px;
+                text-decoration: none;
+                color: var(--app-secondary-color);
+                line-height: 40px;
+            }
+            
+            .drawer-list a.iron-selected {
+                color: black;
+                font-weight: bold;
+            }
+        </style>
+        <app-location route="{{route}}"></app-location>
+        <app-route route="{{route}}" pattern="/:page" data="{{routeData}}" tail="{{subroute}}"></app-route>
+        <app-drawer-layout fullbleed>
+            <!-- Drawer content -->
+            <app-drawer>
+                <app-toolbar>Menu</app-toolbar>
+                <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
+                    <template is="dom-if" if="[[signedIn]]">
+                        <a name="family-profile" href="/family-profile">Family Profile</a>
+                        <a name="player-profile" href="/player-profile">Player Profile</a>
+                    </template>
+                </iron-selector>
+            </app-drawer>
+            <!-- Main content -->
+            <app-header-layout has-scrolling-region>
+                <app-header condenses reveals effects="waterfall">
+                    <app-toolbar>
+                        <paper-icon-button icon="menu" drawer-toggle></paper-icon-button>
+                        <div main-title>Registration App</div>
+                        <div>
+                            <paper-icon-button class="secondary" icon="[[computeLockIcon(signedIn)]]" disabled="[[!signedIn]]" on-tap="lock"></paper-icon-button>
+                        </div>
+                        <!-- add some sign in stuff right here -->
+                    </app-toolbar>
+                </app-header>
+                <!-- put this in its own element and have it flood the page if the user is not logged it -->
+                <my-sign-in id="mySignIn" signed-in="{{signedIn}}" user="{{user}}"></my-sign-in>
+                <iron-pages selected="[[page]]" attr-for-selected="name" fallback-selection="view404" role="main">
+                    <!--                    <my-view1 name="view1"></my-view1>-->
+                    <my-family-profile name="family-profile" user="{{user}}"></my-family-profile>
+                    <my-player-profile name="player-profile" user="{{user}}"></my-player-profile>
+                    <!--          <my-view2 name="view2"></my-view2>
+                              <my-view3 name="view3"></my-view3>-->
+                    <my-view404 name="view404"></my-view404>
+                </iron-pages>
+            </app-header-layout>
+        </app-drawer-layout>
+
+    </template>
+    <script>
+        Polymer({
+            is: 'registration-app',
+            properties: {
+                page: {
+                    type: String,
+                    reflectToAttribute: true,
+                    observer: '_pageChanged'
+                },
+
+            },
+            observers: [
+                '_routePageChanged(routeData.page)'
+            ],
+            computeLockIcon: function (signedIn) {
+                return signedIn ? "lock-open" : "lock";
+            },
+            lock: function () {
+                this.$.mySignIn.signOut();
+            },
+            _routePageChanged: function (page) {
+                this.page = page || 'family-profile';
+            },
+            _pageChanged: function (page) {
+                // Load page import on demand. Show 404 page if fails
+                var resolvedPageUrl = this.resolveUrl('my-' + page + '.html');
+                this.importHref(resolvedPageUrl, null, this._showPage404, true);
+            },
+            _showPage404: function () {
+                this.page = 'view404';
+            }
+        });
+    </script>
+</dom-module>

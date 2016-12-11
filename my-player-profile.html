@@ -1,0 +1,63 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="shared-styles.html">
+<link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+
+<link rel="import" href="../bower_components/paper-styles/paper-styles-classes.html">
+<!--<link rel="import" href="../theme/melon/melon.css" type="css">-->
+<dom-module id="my-player-profile">
+
+    
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
+
+                padding: 10px;
+            }
+        </style>
+        <firebase-query id="qPlayers" app-name="registration-app" user="{{user}}" path="/family-profile/[[user.uid]]/player-profile" data="{{players}}"></firebase-query>
+        [[players.length]]
+        Players? [[players.hasZeroValue]]
+        <paper-button primary raised id="unique" on-tap="addPlayer"></paper-button>
+        <div id="playerProfileContainer">
+            <paper-button hidden$="[[players.length]]" on-tap="addPlayer"></paper-button>
+            <paper-list-box id="playerList" hidden$="[[!players.length]]">
+                <template is="dom-repeat" items="{{players}}">
+                    <paper-item>item.firstName</paper-item>
+                </template>
+            </paper-list-box>
+        </div>
+<!--
+        <div class="card">
+            
+        </div>
+-->
+    </template>
+
+    <script>
+        Polymer({
+            is: 'my-player-profile',
+            properties: {
+                user: {
+                    type: Object,
+                    notify: true
+                },
+                players: {
+                    Type: Array    
+                }
+            }
+        });
+    </script>
+</dom-module>

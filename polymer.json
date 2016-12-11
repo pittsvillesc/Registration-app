@@ -1,16 +1,17 @@
 {
-  "entrypoint": "index.html",
-  "shell": "src/registration-app.html",
-  "fragments": [
+    "entrypoint": "index.html",
+    "shell": "src/registration-app.html",
+    "fragments": [
     "src/my-family-profile.html",
+      "src/my-player-profile.html",
     "src/my-view404.html"
   ],
-  "sourceGlobs": [
+    "sourceGlobs": [
    "src/**/*",
    "images/**/*",
    "bower.json"
   ],
-  "includeDependencies": [
+    "includeDependencies": [
     "manifest.json",
     "bower_components/webcomponentsjs/webcomponents-lite.min.js"
   ]
