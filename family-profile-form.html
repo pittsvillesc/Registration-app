@@ -32,7 +32,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             id="profileDoc" app-name="registration-app" path="[[_computePath()]]" data="{{form}}"> </firebase-document>
 -->
         <!--        <template is="dom-if" if="[[add]]">-->
-        <firebase-document id="profileDoc" app-name="registration-app" path="[[pathBase]][[user.uid]]/" data="[[form]]"> </firebase-document>
+        <firebase-document id="profileDoc" app-name="registration-app" path="[[pathBase]][[user.uid]]/[[key]]" data="[[form]]"> </firebase-document>
         <!--        </template>-->
 
         <!--            <div>Initial? [[initial]]</div>-->
