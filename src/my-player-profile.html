@@ -1,0 +1,166 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="shared-styles.html">
+<link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/iron-selector/iron-selector.html">
+
+<!--<link rel="import" href="../bower_components/paper-fab/paper-fab.html">-->
+<link rel="import" href="../bower_components/paper-styles/paper-styles-classes.html">
+<link rel="import" href="player-profile-form.html">
+<!--<link rel="import" href="../theme/melon/melon.css" type="css">-->
+<dom-module id="my-player-profile">
+
+
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
+                padding: 10px;
+            }
+            
+            paper-fab {
+                position: absolute;
+                margin-top: -25px;
+                margin-left: 80%;
+            }
+            
+            paper-card {
+                margin: 24px;
+                padding: 16px;
+                border-radius: 5px;
+                box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+            }
+        </style>
+        <firebase-query id="qPlayers" app-name="registration-app" user="{{user}}" path="/family-profile/[[user.uid]]/player-profile" data="{{players}}"></firebase-query>
+        <!--        [[players.length]] Players? [[players.hasZeroValue]]-->
+        <!--        <paper-button primary raised id="unique" on-tap="addPlayer"></paper-button>-->
+        <div id="playerProfileContainer" class="layout horizontal wrap">
+            <!--            <paper-button hidden$="[[players.length]]" on-tap="addPlayer"></paper-button>-->
+            <paper-card heading="Registered Players">
+
+<!--                <paper-list-box>-->
+                    <iron-selector id="playerList" selectable>
+                    <!--
+                    <paper-item hidden$="[[hasPlayers]]">
+                        <paper-input id="newPlayerName" value="{{form.firstName}}" label="First Name"></paper-input>
+                    </paper-item>
+-->
+                    <template is="dom-repeat" items="{{players}}">
+                        <paper-item id="player_[[index]]" playeridx="[[index]]" on-tap="selectPlayer">[[item.lastName]], [[item.firstName]]</paper-item>
+                    </template>
+                    </iron-selector>
+<!--                </paper-list-box>-->
+                <!--                <paper-fab raised icon="add" on-tap="addProfile"></paper-fab>-->
+                <div class="card-actions">
+                    <paper-button id="btnAddProfile" icon="add" on-tap="setAddMode">
+                        <iron-icon icon="add"></iron-icon>Add Registered Player</paper-button>
+                </div>
+            </paper-card>
+            <paper-card hidden$="[[editMode]]">
+                <player-profile-form id="addProfileForm" heading="Create New Player" user="[[user]]"></player-profile-form>
+                <div class="buttons">
+                    <paper-button on-tap="savePlayer">Save Player</paper-button>
+                    <paper-button on-tap="setEditMode">Close Form</paper-button>
+                </div>
+            </paper-card>
+            <paper-card hidden$="[[_editIsHidden()]]">
+                <player-profile-form id="addProfileForm" heading="Create New Player" user="[[user]]"></player-profile-form>                
+            </paper-card>
+        </div>
+        <!--
+        <div class="card">
+            
+        </div>
+-->
+        <!--
+        <paper-dialog id="addProfile" modal always-on-top>
+            <player-profile-form id="profileForm" modal heading="Create New Player" userid="[[user.uid]]"></player-profile-form>
+            <div class="buttons">
+                <paper-button dialog-dismiss autofocus>Cancel</paper-button>
+                <paper-button dialog-confirm autofocus on-tap="saveProfile">Save Contact Info</paper-button>
+            </div>
+        </paper-dialog>
+-->
+    </template>
+
+    <script>
+        Polymer({
+            is: 'my-player-profile',
+            properties: {
+                user: {
+                    type: Object,
+                    notify: true
+                },
+                players: {
+                    type: Array,
+                    notify: true
+                },
+                hasPlayers: {
+                    type: Boolean,
+                    reflectToAttribute: true
+                },
+                editMode: {
+                    type: Boolean,
+                    value: true,
+                    reflectToAttribute: true
+                },
+                selectedPlayer: {
+                    type: Object,
+//                    observer: playerChanged
+                },
+                playerSelected: {
+                    type: Boolean,
+                    reflectToAttribute: true,
+                    value: false
+                }
+            },
+            get hasPlayers() {
+                return !this.$.qPlayers.zeroValue;
+            },
+            setAddMode: function () {
+                //                this.$.profileForm.clear();
+                this.editMode = false;
+            },
+            setEditMode: function () {
+                this.editMode = true;
+            },
+            savePlayer: function () {
+                this.editMode = true;
+                this.$.addProfileForm.saveProfile();
+            },
+//            selectPlayer: function(player) {
+//                console.log(player);
+//            },
+            _editIsHidden: function() {
+                if (!this.playerSelected || !this.editMode) {
+                    return true;
+                } else {
+                    return false;
+                }
+            },
+            selectPlayer: function() {
+//                this.playerSelected = true;
+                console.log(this.$.playerList.focused);
+//                console.log(this);
+//                this.selectPlayer = this.players[e.path[0].playeridx];
+//                console.log(e);
+            }
+//            _getSelectedPlayer: function () {
+//                console.log(this.$.playerList.selected);
+//                console.log(this.$.qPlayers.data);
+//                return this.$.qPlayers.data[0];
+//            }
+        });
+    </script>
+</dom-module>

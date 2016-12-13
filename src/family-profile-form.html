@@ -9,36 +9,59 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/polymerfire/firebase-document.html">
+<link rel="import" href="../bower_components/paper-toggle-button/paper-toggle-button.html">
+<!--<link rel="import" href="../bower_components/"-->
 <link rel="import" href="shared-styles.html">
 <dom-module id="family-profile-form">
     <template>
         <style include="shared-styles">
             :host {
                 display: block;
-                padding: 10px;
+                padding: 2px;
+                /*                min-width: 350%;*/
+            }
+            
+            .card {
+                max-width: 375px;
+                margin: 8px;
+                /*                padding*/
             }
         </style>
+        <!--
         <firebase-document
             id="profileDoc" app-name="registration-app" path="[[_computePath()]]" data="{{form}}"> </firebase-document>
+-->
+        <!--        <template is="dom-if" if="[[add]]">-->
+        <firebase-document id="profileDoc" app-name="registration-app" path="[[pathBase]][[user.uid]]/[[key]]" data="[[form]]"> </firebase-document>
+        <!--        </template>-->
+
+        <!--            <div>Initial? [[initial]]</div>-->
+
         <div class="card">
-            <h2>Family Contact Information</h1>
-            <div id="formContainer">
-                <paper-input id="firstName" value="{{form.firstName}}" label="First Name"></paper-input>
-                <paper-input id="lastName" value="{{form.lastName}}" label="Last Name"></paper-input>
-                <paper-input id="streetAddress" value="{{form.streetAddress}}" label="Street Address"></paper-input>
-                <paper-input id="city" value="{{form.city}}" label="City"></paper-input>
-                <paper-input id="zip" value="{{form.zip}}" label="Zip Code"></paper-input>
-                <paper-input id="primaryPhone" value="{{form.primaryPhone}}" label="Primary Phone"></paper-input>
-                <paper-input id="secondaryPhone" value="{{form.secondaryPhone}}" label="Secondary Phone"></paper-input>
-                <paper-input id="email" value="{{form.email}}" label="Email Address"></paper-input>
-                
-            </div>
+            <div hidden$="[[!modal]]">
+                <h2>[[heading]]</h2></div>
+            <div hidden$="[[modal]]">
+                <h4>[[heading]]</h4></div>
+<!--            <paper-dialog-scrollable>-->
+                <div id="formContainer">
+                    <div  hidden$="[[modal]]"><paper-toggle-button id="read_only" checked$="[[!readonly]]" on-change="toggleReadonly">Edit Mode: <span hidden$="[[readonly]]">ON (Changes saved immediately)</span><span hidden$="[[!readonly]]">OFF</span></paper-toggle-button></div>
+                    <paper-input readonly$="[[readonly]]" id="firstName" value="{{form.firstName}}" label="First Name"></paper-input>
+                    <paper-input readonly$="[[readonly]]" id="lastName" value="{{form.lastName}}" label="Last Name"></paper-input>
+                    <paper-input readonly$="[[readonly]]" id="streetAddress" value="{{form.streetAddress}}" label="Street Address"></paper-input>                                        
+                    <paper-input readonly$="[[readonly]]" id="city" value="{{form.city}}" label="City"></paper-input>
+                    <paper-input readonly$="[[readonly]]" id="zip" value="{{form.zip}}" label="Zip Code"></paper-input>
+                    <paper-input readonly$="[[readonly]]" id="primaryPhone" value="{{form.primaryPhone}}" label="Primary Phone"></paper-input>
+                    <paper-input readonly$="[[readonly]]" id="secondaryPhone" value="{{form.secondaryPhone}}" label="Secondary Phone"></paper-input>
+                    <paper-input readonly$="[[readonly]]" id="email" value="{{form.email}}" label="Email Address"></paper-input>
+                </div>
+<!--            </paper-dialog-scrollable>-->
         </div>
     </template>
     <script>
         Polymer({
             is: 'family-profile-form',
             properties: {
+
                 form: {
                     type: Object,
                     notify: true,
@@ -63,33 +86,65 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     value: false,
                     reflectToAttribute: true
                 },
+                initial: {
+                    type: Boolean,
+                    value: false,
+                    reflectToAttribute: true,
+                    notify: true
+                },
+                heading: {
+                    type: String,
+                    value: "",
+                    //                    reflectToAttribute:true
+                },
+                modal: {
+                    type: Boolean,
+                    value: false,
+                    reflectToAttribute: true
+                },
+                readonly: {
+                    type: Boolean,
+                    value: false,
+                    reflectToAttribute: true
+                },
                 user: {
                     type: Object,
                     notfiy: true
                 },
-//                userid: {
-//                    type: String,
-//                    notify: true
-//                },
+                pathBase: {
+                    type: String,
+                    value: "/family-profile/"
+                },
+                //                userid: {
+                //                    type: String,
+                //                    notify: true
+                //                },
                 key: {
                     type: String
                 }
             },
-            saveProfile: function() {
-//                alert("PROFILE SAVED! - " + (this.add ? "ADD MODE" : "EDIT MODE"));
-                console.log(this.$.profileDoc.path);
-                console.log(this.form);
-                alert(this.form);
-//                this.$.profileDoc.save(this.$.profileDoc.path + this.form);
+            saveProfile: function () {
+                //                alert("PROFILE SAVED! - " + (this.add ? "ADD MODE" : "EDIT MODE"));
+                //                console.log(this.$.profileDoc.path);
+                //                console.log(this.form);
+                //                alert(this.form);
+                //                this.$.profileDoc.setStoredValue(this.$.profileDoc.path);
+                //                console.log(this.$.profileDoc.data);
+                //                console.log(this.$.profileDoc.ref);
+                //                console.log(this.$.profileDoc.path);
+                this.$.profileDoc.save("/family-profile/" + this.user.uid + "/");
             },
-            _computePath: function() {
-//                alert("Mode: " + (this.add) ? "Add" : "Edit");
-//                alert(this.userid);
-                console.log(user);
+                toggleReadonly: function() {
+                    this.readonly = (this.$.read_only.checked) ? false : true;
+                },
+            _computePath: function () {
+                //                alert("Mode: " + (this.add) ? "Add" : "Edit");
+                //                alert(this.userid);
+                console.log(this.user);
                 if (this.add) {
-                    return "/family-profile/" + this.user.uid + "/";
+                    return "https://registration-app-a043a.firebaseio.com/family-profile/" + this.user.uid + "/";
                 } else {
-                    return "/family-profile/" + this.user.uid + "/" + this.key + "/";
+                    return "https://registration-app-a043a.firebaseio.com/family-profile/" + this.user.uid + "/" + this.key + "/";
                 }
             }
         });

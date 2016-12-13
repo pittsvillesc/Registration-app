@@ -1,0 +1,116 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-document.html">
+<link rel="import" href="../bower_components/paper-toggle-button/paper-toggle-button.html">
+<link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
+<!--<link rel="import" href="../bower_components/"-->
+<link rel="import" href="shared-styles.html">
+<dom-module id="player-profile-form">
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
+                padding: 2px;
+            }
+            
+            .card {
+                max-width: 375px;
+                margin: 8px;
+            }
+        </style>
+
+        <firebase-document id="profileDoc" app-name="registration-app" path="[[pathBase]][[user.uid]]/player-profile/" data="[[data]]"> </firebase-document>
+
+        <div class="card">
+            <div hidden$="[[!modal]]">
+                <h2>[[heading]]</h2></div>
+            <div hidden$="[[modal]]">
+                <h4>[[heading]]</h4></div>
+            <div id="formContainer">
+<!--
+                <div hidden$="[[modal]]">
+                    <paper-toggle-button id="read_only" checked$="[[!readonly]]" on-change="toggleReadonly">Edit Mode: <span hidden$="[[readonly]]">ON (Changes saved immediately)</span><span hidden$="[[!readonly]]">OFF</span></paper-toggle-button>
+                </div>
+-->
+                <paper-input readonly$="[[readonly]]" class="formField" id="firstName" value="{{data.firstName}}" label="First Name"></paper-input>
+                <paper-input readonly$="[[readonly]]" class="formField" id="lastName" value="{{data.lastName}}" label="Last Name"></paper-input>                
+                <paper-input readonly$="[[readonly]]" class="formField" id="birthdate" type="date" value="{{data.birthdate}}" label="Date of Birth"></paper-input>
+                <paper-input readonly$="[[readonly]]" class="formField" id="school" value="{{data.school}}" label="School"></paper-input>
+<!--                <paper-input readonly$="[[readonly]]" class="formField" id="competitive" value="{{data.competitive}}" label="Competitive"></paper-input>                -->
+                <paper-checkbox>Plays Competitively</paper-checkbox>
+            </div>
+        </div>
+    </template>
+    <script>
+        Polymer({
+            is: 'player-profile-form',
+            properties: {
+                data: {
+                    type: Object,
+                    notify: true,
+                    value: {
+                        firstName: "",
+                        lastName: "",
+                        birthDate: "1/1/2016",
+                        school: "",
+                        competitive: false
+                    }
+                },
+                add: {
+                    type: Boolean,
+                    value: false,
+                    reflectToAttribute: true
+                },
+                heading: {
+                    type: String,
+                    value: "",
+                },
+                modal: {
+                    type: Boolean,
+                    value: false,
+                    reflectToAttribute: true
+                },
+                readonly: {
+                    type: Boolean,
+                    value: false,
+                    reflectToAttribute: true
+                },
+                user: {
+                    type: Object,
+                    notfiy: true
+                },
+                pathBase: {
+                    type: String,
+                    value: "/family-profile/"
+                },
+                key: {
+                    type: String
+                }
+            },
+            saveProfile: function () {
+                console.log("Saving");
+                console.log(this.data);
+                this.$.profileDoc.save(this.$.profileDoc.path);
+            },
+            toggleReadonly: function () {
+                this.readonly = (this.$.read_only.checked) ? false : true;
+            },
+            clear: function() {
+//                this..firstName = "";
+//                this.lastName = "";
+//                this.birthdate = new Date();
+//                this.school = "";
+//                this.competitive = false;
+            }
+        
+        });
+    </script>
+</dom-module>

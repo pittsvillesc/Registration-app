@@ -9,16 +9,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/paper-card/paper-card.html">
-<link rel="import" href="../bower_components/polymerfire/firebase-query.html">
+
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
-<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<!--<link rel="import" href="../bower_components/paper-dialog-behavior/paper-dialog-behavior.html">-->
+<!--<link ref="import" href="../bower_components/paper-dialog/paper-dialog.html">-->
+<!--<link rel="import" href="../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">-->
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="family-profile-form.html">
 <link rel="import" href="shared-styles.html">
 <dom-module id="my-family-profile">
     <template>
-        <style include="shared-styles">
+        <style include="shared-styles iron-flex iron-flex-alignment">
             :host {
                 display: block;
                 padding: 10px;
@@ -26,32 +30,82 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             
             #familyContainer {
                 width: 100%;
+                background-color: var(--paper-input-container-color);
+            }
+            
+            paper-card #welcome_msg {
+                background-color: var(--default-primary-color);
+                color: var(--primary-text-color);
+                margin: 8px;
+                padding: 8px;
+            }
+            
+            paper-dialog {
+                padding: 8px;
+                width: 80%;
+/*                max-width: 600px;*/
+            }
+            
+            paper-dialog > paper-card > div {
+                margin: 8px;
+                padding: 8px;
+            }
+            .card-actions {
+                background-color: var(--primary-background-color);
             }
             /*
             paper-dialog {
                 background-color: var(--modal-background-color);
             }
-*/
+*/      
+            #contactContainer {
+                width: 100%;
+            }
+            #contactContainer > family-profile-form {
+                min-width: 325px;
+            }
         </style>
-        <firebase-query id="qFamily" app-name="registration-app" path="/family-profile/[[user.uid]]" data="{{data}}"></firebase-query>
+        <firebase-query id="qFamily" app-name="registration-app" user="{{user}}" path="/family-profile/[[user.uid]]" data="{{data}}"></firebase-query>
+<!--
+        <paper-dialog-impl id="welcome_msg" modal always-on-top>
+            <paper-card>
+                <div>
+                <div>
+                    <h3>Welcome to Wisconsin Rapids Rec Soccer Registration</h3>
+                </div>
+                <div>Please fill in the information for the primary contact on this account.</div>
+                <div>
+                    We hope to make this as painless as possible for you. You may notice that there might be some additional account set up than you are typically used to for registration. While it may take a few extra minutes, you will find that registering your players in the future will be a snap, as we will retain player information from year to year. Also, you will be able to view payment and season information from this application, as well as receive alerts and other pertinent information from Wisconsin Rapids Rec Soccer. If you have any issues with the site, please use the contact link in the left-hand menu area.
+                </div>
+                </div>
+            </paper-card>
+            <div class="buttons">
+                <paper-button dialog-confirm autofocus on-tap="addProfile">Let's Get Started!</paper-button>
+            </div>
+        </paper-dialog-impl>
+-->
         <paper-card id="familyContainer" heading="Family Profile">
             <div class="card-content">
-                <div>[[user.uid]]</div>
-                <div hidden$="[[hasData]]">You currently do not have any parent or guardians registered. Please do so now.</div>
-                <div hidden$="[[!hasData]]"> Emmentaler or Emmental is a yellow, medium-hard cheese that originated in the area around Emmental, Switzerland. It is one of the cheeses of Switzerland, and is sometimes known as Swiss cheese. </div>
+<!--                <div>[[user.uid]]</div>-->
+                <div hidden$="[[hasData()]]">You currently do not have any parent or guardians registered. Please do so now.</div>
+                <div id="contactContainer" hidden$="[[!hasData()]]"  class="layout horizontal wrap">
+                    <template is="dom-repeat" items="{{data}}">
+<!--                        <div>[[index]] - [[item.firstName]]</div>-->
+                        <family-profile-form readonly heading="[[_getContactHeading(index)]]" form="{{item}}"></family-profile-form>
+                    </template>
+                </div>
             </div>
             <div class="card-actions">
-                <paper-button id="btnAddProfile" hidden$="[[hasData]]" icon="add" on-tap="addProfile">
+                <paper-button id="btnAddProfile" icon="add" on-tap="addProfile">
                     <iron-icon icon="add"></iron-icon> Add Registered Parent or Guardian</paper-button>
                 <!--                <paper-button>Explore!</paper-button>-->
             </div>
         </paper-card>
         <paper-dialog id="addProfile" modal always-on-top>
-            <family-profile-form id="profileForm" add user="[[user]]"></family-profile-form>
+            <family-profile-form id="profileForm" add modal heading="Family Contact Info" user="{{user}}"></family-profile-form>
             <div class="buttons">
                 <paper-button dialog-dismiss autofocus>Cancel</paper-button>
                 <paper-button dialog-confirm autofocus on-tap="saveProfile">Save Contact Info</paper-button>
-                
             </div>
         </paper-dialog>
         <!--
@@ -65,51 +119,73 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </template>
     <script>
         Polymer({
-            is: 'my-family-profile'
-            , properties: {
-                hasData: {
-                    type: Boolean
-                    , value: false
-                },
+            is: 'my-family-profile',
+            properties: {
+//                hasData: {
+//                    type: Boolean,
+////                    value: false,
+//                    notify: true,
+//                    reflectToAttribute: true
+//                },
                 user: {
                     type: Object,
                     notify: true
+                },
+                data: {
+                    Type: Array    
                 }
-            }
-            , get hasData() {
-                return this.$.qFamily.zeroValue;
-            }
-            , noData: function () {
-                console.log(this.$.qFamily.zeroValue)
+            },            
+            hasData: function() {
+                console.log("in has data");
+                console.log(this.$.qFamily);
+                return (this.$.qFamily.zeroValue);
+            },
+            ready: function() {
+                if (!this.hasData) {
+                    var dialog = this.$.welcome_msg;
+                
+                    this.setDialog(true, dialog);
+                    dialog.open();
+                }  
+            },
+            noData: function () {
+                console.log(this.$.qFamily)
                 if (this.$.qFamily.zeroValue) {
                     return true;
-                }
-                else {
+                } else {
                     return false;
                 }
-            }
-            , computeHiddenNoData: function () {
+            },
+            computeHiddenNoData: function () {
+                console.log(data);
                 return this.$.qFamily.zeroValue;
-            }
-            , addProfile: function () {
+            },
+            _getContactHeading: function(index) {
+                if (index === 0) {
+                    return "Primary Family Contact";
+                } else {
+                    return "Family Contact #" + (index + 1);
+                }
+            },
+            addProfile: function () {
                 var dialog = this.$.addProfile;
-                this.setDialog(true);
+                
+                this.setDialog(true, dialog);
                 dialog.open();
-            }
-            , setDialog: function (open) {
+            },
+            setDialog: function (open, modal) {
                 if (open) {
-                    var node = this.$.addProfile;
+                    var node = modal;
                     var textnode = document.querySelector("body");
                     textnode.appendChild(node);
-                }
-                else {
-                    var node = this.$.addProfile;
+                } else {
+                    var node = modal;
                     var textnode = document.querySelector("my-family-profile");
                     textnode.appendChild(node);
                 }
-            }
-            , saveProfile: function () {
-//                alert("SAVING");
+            },
+            saveProfile: function () {
+                //                alert("SAVING");
                 this.$.profileForm.saveProfile();
             }
         });
