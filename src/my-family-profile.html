@@ -17,6 +17,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <!--<link rel="import" href="../bower_components/paper-dialog-behavior/paper-dialog-behavior.html">-->
 <!--<link ref="import" href="../bower_components/paper-dialog/paper-dialog.html">-->
 <!--<link rel="import" href="../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">-->
+<link rel="import" href="../bower_components/iron-collapse/iron-collapse.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/iron-selector/iron-selector.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="family-profile-form.html">
 <link rel="import" href="shared-styles.html">
@@ -43,13 +46,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             paper-dialog {
                 padding: 8px;
                 width: 80%;
-/*                max-width: 600px;*/
+                /*                max-width: 600px;*/
             }
             
             paper-dialog > paper-card > div {
                 margin: 8px;
                 padding: 8px;
             }
+            
             .card-actions {
                 background-color: var(--primary-background-color);
             }
@@ -57,96 +61,98 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             paper-dialog {
                 background-color: var(--modal-background-color);
             }
-*/      
+*/
+            
             #contactContainer {
                 width: 100%;
             }
+            
             #contactContainer > family-profile-form {
                 min-width: 325px;
             }
+            
+            #contactContainer > paper-card {
+                min-width: 325px;
+            }
+            /*
+            paper-card {
+                margin: 24px;
+                padding: 16px;
+                border-radius: 5px;
+                box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+            }
+*/
         </style>
-        <firebase-query id="qFamily" app-name="registration-app" user="{{user}}" path="/family-profile/[[user.uid]]" data="{{data}}"></firebase-query>
-<!--
-        <paper-dialog-impl id="welcome_msg" modal always-on-top>
-            <paper-card>
-                <div>
-                <div>
-                    <h3>Welcome to Wisconsin Rapids Rec Soccer Registration</h3>
-                </div>
-                <div>Please fill in the information for the primary contact on this account.</div>
-                <div>
-                    We hope to make this as painless as possible for you. You may notice that there might be some additional account set up than you are typically used to for registration. While it may take a few extra minutes, you will find that registering your players in the future will be a snap, as we will retain player information from year to year. Also, you will be able to view payment and season information from this application, as well as receive alerts and other pertinent information from Wisconsin Rapids Rec Soccer. If you have any issues with the site, please use the contact link in the left-hand menu area.
-                </div>
-                </div>
-            </paper-card>
-            <div class="buttons">
-                <paper-button dialog-confirm autofocus on-tap="addProfile">Let's Get Started!</paper-button>
-            </div>
-        </paper-dialog-impl>
--->
+
         <paper-card id="familyContainer" heading="Family Profile">
             <div class="card-content">
-<!--                <div>[[user.uid]]</div>-->
-                <div hidden$="[[hasData()]]">You currently do not have any parent or guardians registered. Please do so now.</div>
-                <div id="contactContainer" hidden$="[[!hasData()]]"  class="layout horizontal wrap">
-                    <template is="dom-repeat" items="{{data}}">
-<!--                        <div>[[index]] - [[item.firstName]]</div>-->
-                        <family-profile-form readonly heading="[[_getContactHeading(index)]]" form="{{item}}"></family-profile-form>
-                    </template>
+                <div hidden$="[[hasData(data)]]">You currently do not have any parent or guardians registered. Please do so now.</div>
+                <div id="contactContainer" class="layout horizontal wrap">
+                    <paper-card heading="Parent/Guardians">
+                        <iron-selector id="contactList" selectable attr-for-selected="playeridx" selected="0">
+                            <template is="dom-repeat" items="{{data}}">
+                                <paper-item id="player_[[index]]" playeridx="[[index]]" on-tap="selectPlayer">[[item.lastName]], [[item.firstName]]</paper-item>
+                                <iron-collapse id="form[[index]]">
+                                    <family-profile-form readonly heading="[[_getContactHeading(index)]]" query-ref="{{queryRef}}" user-id="{{userId}}" item="{{item}}"></family-profile-form>
+                                </iron-collapse>
+
+                                <!--                            <iron-collapse opened="false">-->
+
+                                <!--                            </iron-collapse>-->
+                            </template>
+                            <paper-item id="addContactItem" playeridx="x" on-tap="selectPlayer">Add New Contact</paper-item>
+                            <iron-collapse id="formx">
+                                <family-profile-form id="profileForm" add heading="Family Contact Info" query-ref="{{queryRef}}" user-id="{{userId}}"></family-profile-form>
+                                <div class="buttons">
+                                    <!--                                        <paper-button dialog-dismiss autofocus>Cancel</paper-button>-->
+                                    <paper-button dialog-confirm autofocus on-tap="saveProfile">Save Contact Info</paper-button>
+                                </div>
+                            </iron-collapse>
+                        </iron-selector>
+                    </paper-card>
                 </div>
             </div>
             <div class="card-actions">
                 <paper-button id="btnAddProfile" icon="add" on-tap="addProfile">
                     <iron-icon icon="add"></iron-icon> Add Registered Parent or Guardian</paper-button>
-                <!--                <paper-button>Explore!</paper-button>-->
             </div>
         </paper-card>
         <paper-dialog id="addProfile" modal always-on-top>
-            <family-profile-form id="profileForm" add modal heading="Family Contact Info" user="{{user}}"></family-profile-form>
+            <family-profile-form id="profileForm" add modal heading="Family Contact Info" query-ref="{{queryRef}}" user-id="{{userId}}"></family-profile-form>
             <div class="buttons">
                 <paper-button dialog-dismiss autofocus>Cancel</paper-button>
                 <paper-button dialog-confirm autofocus on-tap="saveProfile">Save Contact Info</paper-button>
             </div>
         </paper-dialog>
-        <!--
-        <div class="card">
-            <div class="circle">1</div>
-            <h1>View One</h1>
-            <p>Ut labores minimum atomorum pro. Laudem tibique ut has.
-            <p>Lorem ipsum dolor sit amet, per in nusquam nominavi periculis, sit elit oportere ea.Lorem ipsum dolor sit amet, per in nusquam nominavi periculis, sit elit oportere ea.Cu mei vide viris gloriatur, at populo eripuit sit.</p>
-        </div>
--->
     </template>
     <script>
         Polymer({
             is: 'my-family-profile',
             properties: {
-//                hasData: {
-//                    type: Boolean,
-////                    value: false,
-//                    notify: true,
-//                    reflectToAttribute: true
-//                },
                 user: {
                     type: Object,
                     notify: true
                 },
+                userId: {
+                    type: String
+                },
                 data: {
-                    Type: Array    
+                    type: Array,
+                    notify: true
+                },
+                queryRef: {
+                    type: Object,
+                    reflectToAttribute: true
+                },
+                openedContact: {
+                    type: String
                 }
-            },            
-            hasData: function() {
-                console.log("in has data");
-                console.log(this.$.qFamily);
-                return (this.$.qFamily.zeroValue);
             },
-            ready: function() {
-                if (!this.hasData) {
-                    var dialog = this.$.welcome_msg;
-                
-                    this.setDialog(true, dialog);
-                    dialog.open();
-                }  
+            listeners: {
+                //              "tap": "selectPlayer"  
+            },
+            hasData: function (data) {
+                return (this.data) ? true : false;
             },
             noData: function () {
                 console.log(this.$.qFamily)
@@ -160,7 +166,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 console.log(data);
                 return this.$.qFamily.zeroValue;
             },
-            _getContactHeading: function(index) {
+            _getContactHeading: function (index) {
                 if (index === 0) {
                     return "Primary Family Contact";
                 } else {
@@ -169,7 +175,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             },
             addProfile: function () {
                 var dialog = this.$.addProfile;
-                
+
                 this.setDialog(true, dialog);
                 dialog.open();
             },
@@ -186,7 +192,57 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             },
             saveProfile: function () {
                 //                alert("SAVING");
+                //                console.log(this.$.familyData);
+                this.openedContact = "";
+                this.shadowRoot.querySelector("#formx").toggle();
                 this.$.profileForm.saveProfile();
+            },
+            selectPlayer: function (e) {
+                //                this.playerSelected = true;
+                //                console.log(this.$.contactList.selected);
+                //                console.log(this);
+                //                this.selectPlayer = this.players[e.path[0].playeridx];
+                //                console.log(e.currentTarget.playeridx);
+                //                var nodes = this.shadowRoot.querySelectorAll("iron-collapse");
+                //                for (var node in nodes) {
+                ////                    console.log("here");
+                //                    node.opened = false;
+                //                }
+                //                console.log(this.openedContact);
+                //                if (this.openedContact !== undefined && this.openedContact !== "") {
+                //                    this.shadowRoot.querySelector("#form" + this.openedContact).toggle(function () {
+                //                        this.openedContact = e.currentTarget.playeridx;
+                //                        this.shadowRoot.querySelector("#form" + e.currentTarget.playeridx).toggle();
+                //                    })
+                //                } else {
+                //                console.log(e.currentTarget.playeridx)
+                console.log(e.currentTarget);
+                if (this.openedContact === undefined || this.openedContact === "") {
+                    if (e.currentTarget.playeridx === undefined) {
+                        this.openedContact = "x";
+                        this.shadowRoot.querySelector("#formx").toggle();
+                    } else {
+                        this.openedContact = e.currentTarget.playeridx;
+                        this.shadowRoot.querySelector("#form" + e.currentTarget.playeridx).toggle();
+                    }
+                } else {
+                    if (this.openedContact !== e.currentTarget.playeridx) {
+                        this.shadowRoot.querySelector("#form" + this.openedContact).toggle();
+                        if (e.currentTarget.playeridx === undefined) {
+                            this.openedContact = "x";
+                            this.shadowRoot.querySelector("#formx").toggle();
+                        } else {
+                            this.openedContact = e.currentTarget.playeridx;
+                            this.shadowRoot.querySelector("#form" + e.currentTarget.playeridx).toggle();
+                        }
+                    } else {
+                        this.openedContact = "";
+                        this.shadowRoot.querySelector("#form" + e.currentTarget.playeridx).toggle();
+                    }
+                }
+                //                }
+
+
             }
         });
     </script>

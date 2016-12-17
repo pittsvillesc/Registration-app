@@ -42,7 +42,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
             }
         </style>
-        <firebase-query id="qPlayers" app-name="registration-app" user="{{user}}" path="/family-profile/[[user.uid]]/player-profile" data="{{players}}"></firebase-query>
+<!--        <firebase-query id="qPlayers" app-name="registration-app" user="{{user}}" path="/[[user.uid]]/family-profile/player-profile" data="{{players}}"></firebase-query>-->
         <!--        [[players.length]] Players? [[players.hasZeroValue]]-->
         <!--        <paper-button primary raised id="unique" on-tap="addPlayer"></paper-button>-->
         <div id="playerProfileContainer" class="layout horizontal wrap">
@@ -56,7 +56,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         <paper-input id="newPlayerName" value="{{form.firstName}}" label="First Name"></paper-input>
                     </paper-item>
 -->
-                    <template is="dom-repeat" items="{{players}}">
+                    <template is="dom-repeat" items="{{data}}">
                         <paper-item id="player_[[index]]" playeridx="[[index]]" on-tap="selectPlayer">[[item.lastName]], [[item.firstName]]</paper-item>
                     </template>
                     </iron-selector>
@@ -102,10 +102,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     type: Object,
                     notify: true
                 },
-                players: {
-                    type: Array,
-                    notify: true
-                },
+//                players: {
+//                    type: Array,
+//                    notify: true
+//                },
                 hasPlayers: {
                     type: Boolean,
                     reflectToAttribute: true

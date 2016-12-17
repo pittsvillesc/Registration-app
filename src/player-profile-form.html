@@ -27,7 +27,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
         </style>
 
-        <firebase-document id="profileDoc" app-name="registration-app" path="[[pathBase]][[user.uid]]/player-profile/" data="[[data]]"> </firebase-document>
+<!--        <firebase-document id="profileDoc" app-name="registration-app" path="[[pathBase]][[user.uid]]/player-profile/" data="[[data]]"> </firebase-document>-->
 
         <div class="card">
             <div hidden$="[[!modal]]">
@@ -45,7 +45,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <paper-input readonly$="[[readonly]]" class="formField" id="birthdate" type="date" value="{{data.birthdate}}" label="Date of Birth"></paper-input>
                 <paper-input readonly$="[[readonly]]" class="formField" id="school" value="{{data.school}}" label="School"></paper-input>
 <!--                <paper-input readonly$="[[readonly]]" class="formField" id="competitive" value="{{data.competitive}}" label="Competitive"></paper-input>                -->
-                <paper-checkbox>Plays Competitively</paper-checkbox>
+                <paper-checkbox class="formField" id="competitive" checked$={{data.competitive}}>Plays Competitively</paper-checkbox>
             </div>
         </div>
     </template>
@@ -53,7 +53,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         Polymer({
             is: 'player-profile-form',
             properties: {
-                data: {
+                player: {
                     type: Object,
                     notify: true,
                     value: {
@@ -86,6 +86,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 user: {
                     type: Object,
                     notfiy: true
+                },
+                userId: {
+                  type: String  
                 },
                 pathBase: {
                     type: String,

@@ -31,30 +31,36 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <firebase-document
             id="profileDoc" app-name="registration-app" path="[[_computePath()]]" data="{{form}}"> </firebase-document>
 -->
-        <!--        <template is="dom-if" if="[[add]]">-->
-        <firebase-document id="profileDoc" app-name="registration-app" path="[[pathBase]][[user.uid]]/[[key]]" data="[[form]]"> </firebase-document>
-        <!--        </template>-->
+        <!--
+        <template is="dom-if" if="[[add]]">
+            <firebase-document id="profileDoc" app-name="registration-app" path="/[[pathBase]]/[userId]]/" data="[[familyContact]]"> </firebase-document>
+        </template>
+-->
+        <firebase-document id="profileDoc" app-name="registration-app" path="/[[pathBase]]/[userId]]/[[item.$key]]/" data="[[item]]"> </firebase-document>
 
         <!--            <div>Initial? [[initial]]</div>-->
 
         <div class="card">
+
             <div hidden$="[[!modal]]">
                 <h2>[[heading]]</h2></div>
             <div hidden$="[[modal]]">
                 <h4>[[heading]]</h4></div>
-<!--            <paper-dialog-scrollable>-->
-                <div id="formContainer">
-                    <div  hidden$="[[modal]]"><paper-toggle-button id="read_only" checked$="[[!readonly]]" on-change="toggleReadonly">Edit Mode: <span hidden$="[[readonly]]">ON (Changes saved immediately)</span><span hidden$="[[!readonly]]">OFF</span></paper-toggle-button></div>
-                    <paper-input readonly$="[[readonly]]" id="firstName" value="{{form.firstName}}" label="First Name"></paper-input>
-                    <paper-input readonly$="[[readonly]]" id="lastName" value="{{form.lastName}}" label="Last Name"></paper-input>
-                    <paper-input readonly$="[[readonly]]" id="streetAddress" value="{{form.streetAddress}}" label="Street Address"></paper-input>                                        
-                    <paper-input readonly$="[[readonly]]" id="city" value="{{form.city}}" label="City"></paper-input>
-                    <paper-input readonly$="[[readonly]]" id="zip" value="{{form.zip}}" label="Zip Code"></paper-input>
-                    <paper-input readonly$="[[readonly]]" id="primaryPhone" value="{{form.primaryPhone}}" label="Primary Phone"></paper-input>
-                    <paper-input readonly$="[[readonly]]" id="secondaryPhone" value="{{form.secondaryPhone}}" label="Secondary Phone"></paper-input>
-                    <paper-input readonly$="[[readonly]]" id="email" value="{{form.email}}" label="Email Address"></paper-input>
+            <!--            <paper-dialog-scrollable>-->
+            <div id="formContainer">                
+                <div hidden$="[[modal]]">
+                    <paper-toggle-button id="read_only" checked$="[[!readonly]]" on-change="toggleReadonly">Edit Mode: <span hidden$="[[readonly]]">ON (Changes saved immediately)</span><span hidden$="[[!readonly]]">OFF</span></paper-toggle-button>
                 </div>
-<!--            </paper-dialog-scrollable>-->
+                <paper-input readonly$="[[readonly]]" id="firstName" value="{{item.firstName}}" label="First Name"></paper-input>
+                <paper-input readonly$="[[readonly]]" id="lastName" value="{{item.lastName}}" label="Last Name"></paper-input>
+                <paper-input readonly$="[[readonly]]" id="streetAddress" value="{{item.streetAddress}}" label="Street Address"></paper-input>
+                <paper-input readonly$="[[readonly]]" id="city" value="{{item.city}}" label="City"></paper-input>
+                <paper-input readonly$="[[readonly]]" id="zip" value="{{item.zip}}" label="Zip Code"></paper-input>
+                <paper-input readonly$="[[readonly]]" id="primaryPhone" value="{{item.primaryPhone}}" label="Primary Phone"></paper-input>
+                <paper-input readonly$="[[readonly]]" id="secondaryPhone" value="{{item.secondaryPhone}}" label="Secondary Phone"></paper-input>
+                <paper-input readonly$="[[readonly]]" id="email" value="{{item.email}}" label="Email Address"></paper-input>
+            </div>
+            <!--            </paper-dialog-scrollable>-->
         </div>
     </template>
     <script>
@@ -62,7 +68,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             is: 'family-profile-form',
             properties: {
 
-                form: {
+                item: {
                     type: Object,
                     notify: true,
                     value: {
@@ -75,6 +81,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         secondaryPhone: "",
                         email: ""
                     }
+                },
+                queryRef: {
+                    type: Object,
+                    reflectToAttribute: true
+                },
+                userId: {
+                    type: String
                 },
                 add: {
                     type: Boolean,
@@ -123,7 +136,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     type: String
                 }
             },
-            saveProfile: function () {
+            saveProfile: function (ref) {
                 //                alert("PROFILE SAVED! - " + (this.add ? "ADD MODE" : "EDIT MODE"));
                 //                console.log(this.$.profileDoc.path);
                 //                console.log(this.form);
@@ -132,11 +145,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 //                console.log(this.$.profileDoc.data);
                 //                console.log(this.$.profileDoc.ref);
                 //                console.log(this.$.profileDoc.path);
-                this.$.profileDoc.save("/family-profile/" + this.user.uid + "/");
+                //                this.familyContact
+
+                //                console.log(ref);
+                this.$.profileDoc.save("/family-profile/" + this.userId + "/");
             },
-                toggleReadonly: function() {
-                    this.readonly = (this.$.read_only.checked) ? false : true;
-                },
+            toggleReadonly: function () {
+                this.readonly = (this.$.read_only.checked) ? false : true;
+            },
             _computePath: function () {
                 //                alert("Mode: " + (this.add) ? "Add" : "Edit");
                 //                alert(this.userid);

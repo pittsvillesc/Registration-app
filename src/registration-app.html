@@ -26,7 +26,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../bower_components/polymerfire/firebase-app.html">
 <link rel="import" href="../bower_components/polymerfire/firebase-document.html">
-<link rel="import" href="../bower_components/polymerfire/firebase-query.html">
+<link rel="import" href="reg-data.html">
 <!--<link rel="import" href="my-icons.html">-->
 <link rel="import" href="my-sign-in.html">
 <link rel="import" href="shared-styles.html">
@@ -104,10 +104,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 </app-header>
                 <!-- put this in its own element and have it flood the page if the user is not logged it -->
                 <my-sign-in id="mySignIn" signed-in="{{signedIn}}" user="{{user}}"></my-sign-in>
+<!--                <template is="dom-if" if="[[signedIn]]">-->
+                    <reg-data id="familyData" query-ref="{{queryRef}}" data="{{data}}" user-id="[[user.uid]]"></reg-data>
+<!--                </template>-->
                 <iron-pages selected="[[page]]" attr-for-selected="name" fallback-selection="view404" role="main">
                     <!--                    <my-view1 name="view1"></my-view1>-->
-                    <my-family-profile name="family-profile" user="{{user}}"></my-family-profile>
-                    <my-player-profile name="player-profile" user="{{user}}"></my-player-profile>
+<!--                    <template is="dom-if" if="[[signedIn]]">-->
+                        <my-family-profile name="family-profile" user-id="[[user.uid]]" user="{{user}}" query-ref="{{queryRef}}" data="{{data}}"></my-family-profile>
+                        <my-player-profile name="player-profile" user-id="[[user.uid]]" user="{{user}}" query-ref="{{queryRef}}" data="{{data.player-profile}}"></my-player-profile>
+<!--                    </template>-->
+
                     <!--          <my-view2 name="view2"></my-view2>
                               <my-view3 name="view3"></my-view3>-->
                     <my-view404 name="view404"></my-view404>
