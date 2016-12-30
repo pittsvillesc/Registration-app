@@ -105,13 +105,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <!-- put this in its own element and have it flood the page if the user is not logged it -->
                 <my-sign-in id="mySignIn" signed-in="{{signedIn}}" user="{{user}}"></my-sign-in>
 <!--                <template is="dom-if" if="[[signedIn]]">-->
-                    <reg-data id="familyData" query-ref="{{queryRef}}" data="{{data}}" user-id="[[user.uid]]"></reg-data>
+                    <reg-data id="familyData" query-ref="{{queryRef}}" data="{{data}}" user-id="[[user.uid]]" ref="{{ref}}"></reg-data>
 <!--                </template>-->
                 <iron-pages selected="[[page]]" attr-for-selected="name" fallback-selection="view404" role="main">
                     <!--                    <my-view1 name="view1"></my-view1>-->
 <!--                    <template is="dom-if" if="[[signedIn]]">-->
                         <my-family-profile name="family-profile" user-id="[[user.uid]]" user="{{user}}" query-ref="{{queryRef}}" data="{{data}}"></my-family-profile>
-                        <my-player-profile name="player-profile" user-id="[[user.uid]]" user="{{user}}" query-ref="{{queryRef}}" data="{{data.player-profile}}"></my-player-profile>
+                        <my-player-profile name="player-profile" user-id="[[user.uid]]" user="{{user}}" query-ref="{{queryRef}}" data="{{data}}"></my-player-profile>
 <!--                    </template>-->
 
                     <!--          <my-view2 name="view2"></my-view2>
@@ -131,6 +131,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     reflectToAttribute: true,
                     observer: '_pageChanged'
                 },
+//                data: {
+//                    type: Object,
+//                    notify: true
+//                }
 
             },
             observers: [

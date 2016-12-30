@@ -36,7 +36,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <firebase-document id="profileDoc" app-name="registration-app" path="/[[pathBase]]/[userId]]/" data="[[familyContact]]"> </firebase-document>
         </template>
 -->
-        <firebase-document id="profileDoc" app-name="registration-app" path="/[[pathBase]]/[userId]]/[[item.$key]]/" data="[[item]]"> </firebase-document>
+        <firebase-document id="profileDoc" app-name="registration-app" path="/[[pathBase]]/[userId]]/[[item.$key]]/family-contacts/" data="[[item]]"> </firebase-document>
 
         <!--            <div>Initial? [[initial]]</div>-->
 
@@ -148,21 +148,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 //                this.familyContact
 
                 //                console.log(ref);
-                this.$.profileDoc.save("/family-profile/" + this.userId + "/");
+                this.$.profileDoc.save("/family-profile/" + this.userId + "/family-contacts/");
+            },
+            deleteProfile: function() {
+              console.log("In Profile Form and about to delete");  
+//                this.$.profileDoc.destroy("/family-profile/" + this.userId + "/");
             },
             toggleReadonly: function () {
                 this.readonly = (this.$.read_only.checked) ? false : true;
             },
-            _computePath: function () {
-                //                alert("Mode: " + (this.add) ? "Add" : "Edit");
-                //                alert(this.userid);
-                console.log(this.user);
-                if (this.add) {
-                    return "https://registration-app-a043a.firebaseio.com/family-profile/" + this.user.uid + "/";
-                } else {
-                    return "https://registration-app-a043a.firebaseio.com/family-profile/" + this.user.uid + "/" + this.key + "/";
-                }
-            }
+            
         });
     </script>
 </dom-module>

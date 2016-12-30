@@ -35,14 +35,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 width: 100%;
                 background-color: var(--paper-input-container-color);
             }
-            
-            paper-card #welcome_msg {
-                background-color: var(--default-primary-color);
-                color: var(--primary-text-color);
-                margin: 8px;
-                padding: 8px;
-            }
-            
+                        
             paper-dialog {
                 padding: 8px;
                 width: 80%;
@@ -82,18 +75,54 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
             }
 */
+            
+            .paperItemHorizontal {
+                @apply(--layout-horizontal);
+            }
+            
+            .flex-end-justified {
+                @apply(--layout-horizontal);
+                @apply(--layout-end-justified);
+            }
+            
+            .endJustified {
+                @apply(--layout-end-justified);
+            }
+            .flexMid {
+                @apply(--layout-flex);
+            }
         </style>
 
         <paper-card id="familyContainer" heading="Family Profile">
             <div class="card-content">
-                <div hidden$="[[hasData(data)]]">You currently do not have any parent or guardians registered. Please do so now.</div>
+                <div hidden$="[[hasData(data)]]" on-tap="tShowData">You currently do not have any parent or guardians registered. Please do so now.</div>
                 <div id="contactContainer" class="layout horizontal wrap">
                     <paper-card heading="Parent/Guardians">
+
                         <iron-selector id="contactList" selectable attr-for-selected="playeridx" selected="0">
                             <template is="dom-repeat" items="{{data}}">
-                                <paper-item id="player_[[index]]" playeridx="[[index]]" on-tap="selectPlayer">[[item.lastName]], [[item.firstName]]</paper-item>
+                                <paper-item id="player_[[index]]" class="paperItemHorizontal" playeridx="[[index]]" >
+                                    <!--                                    <div class="paperItemHorizontal">-->
+                                    <div>
+                                        <span>
+                                            <paper-icon-button icon="delete" on-tap="deleteGuardian" item-idx="[[index]]" item-key="[[item.$key]]"></paper-icon-button>
+                                        </span> 
+                                        
+                                    </div>
+                                    <div class="flexMid" on-tap="selectPlayer">[[item.lastName]], [[item.firstName]]</div>
+                                    <div class="flex-end-justified" on-tap="selectPlayer">
+                                        <div class="endJustified">
+                                            <paper-icon-button icon="expand-more"></paper-icon-button>
+                                        </div>
+                                        <div class="endJustified">
+                                            <paper-icon-button icon="expand-less" hidden></paper-icon-button>
+                                        </div>
+                                    </div>
+
+                                    <!--                                    </div>-->
+                                </paper-item>
                                 <iron-collapse id="form[[index]]">
-                                    <family-profile-form readonly heading="[[_getContactHeading(index)]]" query-ref="{{queryRef}}" user-id="{{userId}}" item="{{item}}"></family-profile-form>
+                                    <family-profile-form id="profileEditForm[[index]]" readonly heading="[[_getContactHeading(index)]]" query-ref="{{queryRef}}" user-id="{{userId}}" item="{{item}}"></family-profile-form>
                                 </iron-collapse>
 
                                 <!--                            <iron-collapse opened="false">-->
@@ -117,6 +146,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     <iron-icon icon="add"></iron-icon> Add Registered Parent or Guardian</paper-button>
             </div>
         </paper-card>
+        <paper-dialog id="deleteDialog">
+            Are you sure you want to delete this contact?
+            <paper-button dialog-dismiss autofocus>Cancel</paper-button>
+                <paper-button dialog-confirm autofocus on-tap="saveProfile">Save Contact Info</paper-button>
+        </paper-dialog>
         <paper-dialog id="addProfile" modal always-on-top>
             <family-profile-form id="profileForm" add modal heading="Family Contact Info" query-ref="{{queryRef}}" user-id="{{userId}}"></family-profile-form>
             <div class="buttons">
@@ -150,8 +184,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             },
             listeners: {
                 //              "tap": "selectPlayer"  
+                
             },
             hasData: function (data) {
+                
+                console.info("data: ", data);
+                console.info("this.data: ", this.data);
                 return (this.data) ? true : false;
             },
             noData: function () {
@@ -167,11 +205,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 return this.$.qFamily.zeroValue;
             },
             _getContactHeading: function (index) {
-                if (index === 0) {
-                    return "Primary Family Contact";
-                } else {
-                    return "Family Contact #" + (index + 1);
-                }
+               
+                    return "Player #" + (index + 1);
+               
             },
             addProfile: function () {
                 var dialog = this.$.addProfile;
@@ -243,6 +279,31 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 //                }
 
 
+            },
+            deleteGuardian: function(e) {
+//                preventDefault();
+                var idx = e.currentTarget.itemIdx;
+                var key = e.currentTarget.itemKey;
+                
+                if (idx === 0) {
+                    alert("You are unable to delete the primary contact for this family");
+                } else {
+//                    console.log(this.$.qFamilyData);
+                    
+                    var nEvent = Polymer.dom(e);
+                    var vApp = nEvent.path[31];
+                    var vData = vApp.$.familyData;
+                    var vRef = vData.$.qFamilyData.ref.child("/" + key);
+                    vRef.remove(function() {
+                        alert("Contact Deleted - do something here!");
+                    })
+                    
+                }
+//                console.log(e.currentTarget.itemIdx);
+                
+            },
+            tShowData: function() {
+                console.info("data: ", this.data);
             }
         });
     </script>

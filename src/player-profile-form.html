@@ -27,7 +27,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
         </style>
 
-<!--        <firebase-document id="profileDoc" app-name="registration-app" path="[[pathBase]][[user.uid]]/player-profile/" data="[[data]]"> </firebase-document>-->
+        <firebase-document id="profileDoc" app-name="registration-app" path="[[pathBase]][[user.uid]]/player-profile/[[data.$key]]/" data="[[data]]"> </firebase-document>
 
         <div class="card">
             <div hidden$="[[!modal]]">
@@ -53,7 +53,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         Polymer({
             is: 'player-profile-form',
             properties: {
-                player: {
+                data: {
                     type: Object,
                     notify: true,
                     value: {
@@ -99,9 +99,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 }
             },
             saveProfile: function () {
-                console.log("Saving");
+                console.log(this.userId);
                 console.log(this.data);
-                this.$.profileDoc.save(this.$.profileDoc.path);
+                this.$.profileDoc.save("/family-profile/" + this.userId + "/player-profile/");
             },
             toggleReadonly: function () {
                 this.readonly = (this.$.read_only.checked) ? false : true;
